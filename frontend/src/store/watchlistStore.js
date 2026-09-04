@@ -1,5 +1,11 @@
 import { create } from 'zustand';
 import { api } from '../api/client';
+import { 
+  DEFAULT_WATCHLISTS, 
+  generateMockFeed, 
+  generateMockHealth, 
+  generateMockTimeline 
+} from '../api/mockFallback';
 
 export const DEFAULT_WEIGHTS = {
   w1: 2.5,
@@ -9,12 +15,12 @@ export const DEFAULT_WEIGHTS = {
 };
 
 export const useWatchlistStore = create((set, get) => ({
-  watchlists: [],
-  activeWatchlistId: null,
-  feedData: null,
-  healthData: null,
+  watchlists: DEFAULT_WATCHLISTS,
+  activeWatchlistId: 1,
+  feedData: generateMockFeed(1),
+  healthData: generateMockHealth(1).health,
   correlationData: null,
-  timelineSlices: [],
+  timelineSlices: generateMockTimeline(1).slices,
   selectedTimelineId: 'now',
   algorithmWeights: { ...DEFAULT_WEIGHTS },
   isLoading: false,
@@ -85,16 +91,17 @@ export const useWatchlistStore = create((set, get) => ({
   fetchWatchlists: async () => {
     try {
       const res = await api.getWatchlists();
-      const currentActive = get().activeWatchlistId;
-      const defaultId = res.watchlists.length > 0 ? (currentActive || res.watchlists[0].id) : null;
-      
-      set({ watchlists: res.watchlists, activeWatchlistId: defaultId });
-      
-      if (defaultId) {
-        get().loadWatchlistData(defaultId);
+      if (res && res.watchlists && res.watchlists.length > 0) {
+        const currentActive = get().activeWatchlistId;
+        const defaultId = currentActive || res.watchlists[0].id;
+        set({ watchlists: res.watchlists, activeWatchlistId: defaultId });
+        get().loadWatchlistData(defaultId, true);
+      } else {
+        const currentActive = get().activeWatchlistId || 1;
+        set({ watchlists: DEFAULT_WATCHLISTS, activeWatchlistId: currentActive });
       }
     } catch (err) {
-      console.error('Failed to fetch watchlists:', err);
+      console.warn('Failed to fetch watchlists from backend, keeping fallback:', err);
     }
   },
 
@@ -105,8 +112,7 @@ export const useWatchlistStore = create((set, get) => ({
 
   loadWatchlistData: async (id, isSilent = false) => {
     if (!id) return;
-    if (!isSilent) set({ isLoading: true });
-    else set({ isRefreshing: true });
+    if (isSilent) set({ isRefreshing: true });
 
     try {
       const weights = get().algorithmWeights;
@@ -117,15 +123,22 @@ export const useWatchlistStore = create((set, get) => ({
       ]);
 
       set({
-        feedData: feedRes,
-        healthData: healthRes?.health || null,
-        timelineSlices: timelineRes?.slices || [],
+        feedData: feedRes || generateMockFeed(id, weights),
+        healthData: healthRes?.health || generateMockHealth(id).health,
+        timelineSlices: timelineRes?.slices && timelineRes.slices.length > 0 ? timelineRes.slices : generateMockTimeline(id).slices,
         isLoading: false,
         isRefreshing: false
       });
     } catch (err) {
-      console.error('Failed to load watchlist data:', err);
-      set({ isLoading: false, isRefreshing: false });
+      console.warn('Failed to load watchlist data, using offline fallback:', err);
+      const weights = get().algorithmWeights;
+      set({ 
+        feedData: generateMockFeed(id, weights),
+        healthData: generateMockHealth(id).health,
+        timelineSlices: generateMockTimeline(id).slices,
+        isLoading: false, 
+        isRefreshing: false 
+      });
     }
   },
 
