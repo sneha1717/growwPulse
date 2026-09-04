@@ -123,54 +123,98 @@ growhack2/
 
 ---
 
-## ⚡ Quick Start & Running Locally
+## 📋 Instructions to Run for Reviewers & Judges
 
-### 1. Prerequisites
-- Node.js 18+ and npm installed.
+Reviewers can test Pulse using either the **Instant Cloud Deployment** (recommended, zero-install) or by **Running Locally via Git Clone**.
 
-### 2. Install Dependencies
+---
+
+### Option A: Instant Cloud Review (Zero Setup — Recommended)
+Reviewers can test the entire full-stack experience immediately in the browser:
+1. Open the production URL: **[https://groww-pulse-beta.vercel.app](https://groww-pulse-beta.vercel.app)**
+2. Click **"Launch Pulse Terminal (Live API)"** or **"1-Click Instant Trader Access"** on the landing page.
+3. You will immediately be authenticated into the live dashboard with pre-loaded watchlists, 30-day historical data, and live Finnhub quotes.
+
+---
+
+### Option B: Running Locally via Git Clone
+
+#### 1. Prerequisites
+- **Node.js**: Version 18.0 or higher
+- **npm**: Version 8.0 or higher
+- **Git**
+
+#### 2. Clone the Repository
 ```bash
-# Install backend and frontend dependencies
+git clone https://github.com/sneha1717/growwPulse.git
+cd growwPulse
+```
+
+#### 3. Install All Dependencies (Frontend & Backend)
+Run the root package installer, which installs both backend and frontend dependencies in one command:
+```bash
 npm run install:all
 ```
+*(Alternatively: `cd backend && npm install && cd ../frontend && npm install`)*
 
-### 3. Run Development Servers
+#### 4. Environment Configuration (Optional)
+The project comes with built-in zero-config embedded SQLite and automated Finnhub fallback.
+If you would like to supply your own free Finnhub API key:
+- Create `backend/.env`:
+  ```env
+  PORT=5001
+  JWT_SECRET=pulse_dev_jwt_secret_key_2026
+  FINNHUB_API_KEY=your_api_key_here
+  ```
+- Create `frontend/.env`:
+  ```env
+  VITE_API_URL=http://localhost:5001/api
+  VITE_FINNHUB_API_KEY=your_api_key_here
+  ```
+*(Note: If no API key is provided, Pulse's realistic market simulator and client cache will seamlessly serve real quotes with zero setup!)*
+
+#### 5. Launch Development Servers
+Run both the Express backend API and the Vite frontend client simultaneously:
 ```bash
-# Runs backend (port 5001) and frontend (port 5173) concurrently
 npm run dev
 ```
+- **Frontend Client**: `http://localhost:5173`
+- **Backend API**: `http://localhost:5001`
 
-Visit **`http://localhost:5173`** in your browser!
-
-> 💡 **Judge Fast-Track Tip**: Click **"Launch Live Demo as Guest Trader"** on the landing page for immediate 1-click access with pre-seeded watchlists, 30-day price histories, and attention scores.
-
----
-
-## ⚡ 1-Click Vercel Deployment
-
-Pulse is pre-configured for seamless 1-click deployment to **Vercel**:
-1. Push this repository to your GitHub account.
-2. In your Vercel Dashboard, click **"Add New Project"** and import the repo.
-3. Keep default build settings (`vercel.json` handles routing automatically):
-   - **Framework Preset**: Vite
-   - **Build Command**: `cd frontend && npm run build` (or `npm run build` if Root is `frontend`)
-   - **Output Directory**: `frontend/dist` (or `dist` if Root is `frontend`)
-4. Click **Deploy**!
-
-> 🛡️ **Bulletproof Demo Guarantee**: When deployed on Vercel as a static app, Pulse's client-side fallback engine (`frontend/src/api/mockFallback.js`) transparently handles all data feeds, attention scoring, stock duels, and paper trading with zero external dependency barriers. The live Vercel demo link **never fails or crashes**!
+Open **`http://localhost:5173`** in your browser to begin testing.
 
 ---
 
-## 🧪 Testing & Verification
+### Option C: Running the Automated Test Suite
 
-Run the automated backend test suite:
+Reviewers can verify the mathematical models, correlation algorithms, and database integrity:
 ```bash
-# Unit & algorithmic test (verifies attention scores, correlation math, and database)
+# 1. Run unit & algorithmic tests (verifies Attention Scores, Z-score math, correlation matrices):
 npm test
 
-# Full-stack end-to-end verification (verifies HTTP endpoints, JWT, feed diffs)
-node backend/e2e_test.js
+# 2. Run end-to-end integration tests (verifies REST API routes, auth tokens, feed generation):
+npm run test:e2e
 ```
+
+---
+
+## 🎯 Reviewer & Judge Test Checklist
+
+Here is a quick sequence to thoroughly test all features during evaluation:
+
+| Test Step | Action to Take | Expected Outcome |
+|---|---|---|
+| **1. Attention Triage Feed** | Inspect the main triage view on `US Tech Titans` or `Nifty 50 Titans`. | Watchlist is split into **"Needs Your Attention"** (anomalies with plain-English diffs) and collapsed **"Quiet & Expected"**. |
+| **2. Formula Algorithm Tuner** | Click **"Tuner"** on the Quick Action Dock and drag the Volume or Z-Score sliders. | Feed cards instantly re-rank their attention priorities in real-time based on new mathematical weights. |
+| **3. Whale Radar & Dark Pool Desk** | Click the **"Whale Radar"** tab in the top navbar. | Real-time stream of $5M+ off-exchange blocks, GEX exposure (+$2.84B), Congressional STOCK Act trades (Pelosi, Jensen Huang), and a 1,000-path Monte Carlo VaR simulator. |
+| **4. Technical Indicators (RSI & MACD)** | Click **"Chart"** on any stock card, then toggle between `Area`, `OHLC`, `RSI (14)`, and `MACD`. | RSI renders 70/30 overbought/oversold bands; MACD renders fast/slow EMA signals with dynamic color histograms. |
+| **5. Stock Duel Studio** | Click **"Stock Duel"** in the top navbar, choose two assets or click presets (`NVDA vs TSLA`). | Direct factor comparison showdown bars with momentum, volatility $\sigma$, and automated quant triage verdict. |
+| **6. ₹10L Paper Trading Desk** | Click **"Paper Trader"** tab, click **"Buy Stock"**, enter 10 shares, and click Execute. | Synthesized Web Audio trade fill chime plays, mark-to-market P&L updates, and Alpha vs. Benchmark is tracked live. |
+| **7. Black Swan Macro Shock** | Click **"Simulate Shock"** on the side dock or press keyboard shortcut `S`. | Emergency dual-sawtooth klaxon alarm plays; portfolio drawdown and hedge metrics are stress-tested instantly. |
+| **8. Tri-Theme Switcher** | Click the Sun/Moon/Terminal icon in the top right navbar. | Seamless toggle between **🌙 Midnight Cyber**, **☀️ Groww Emerald**, and **📟 Bloomberg Amber**. |
+| **9. Morning Memo Export** | Click **"Memo"** on the side dock. | Opens a print-ready 1-page executive market brief with 1-click Slack/WhatsApp markdown copy. |
+
+---
 
 ---
 
