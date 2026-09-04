@@ -78,9 +78,10 @@ export default function Dashboard() {
 
   const updateMarketPrices = usePaperTradingStore(state => state.updateMarketPrices);
 
-  // Poll for latest data every 20 seconds while on dashboard
+  // Trigger immediate live fetch on mount & poll for latest data every 20 seconds while on dashboard
   useEffect(() => {
     if (!activeWatchlistId) return;
+    loadWatchlistData(activeWatchlistId, true);
     const interval = setInterval(() => {
       loadWatchlistData(activeWatchlistId, true);
     }, 20000);

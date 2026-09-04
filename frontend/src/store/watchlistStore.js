@@ -99,9 +99,12 @@ export const useWatchlistStore = create((set, get) => ({
       } else {
         const currentActive = get().activeWatchlistId || 1;
         set({ watchlists: DEFAULT_WATCHLISTS, activeWatchlistId: currentActive });
+        get().loadWatchlistData(currentActive, true);
       }
     } catch (err) {
       console.warn('Failed to fetch watchlists from backend, keeping fallback:', err);
+      const currentActive = get().activeWatchlistId || 1;
+      get().loadWatchlistData(currentActive, true);
     }
   },
 
