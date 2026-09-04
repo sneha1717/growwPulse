@@ -1,0 +1,45 @@
+-- Pulse Database Schema (PostgreSQL & SQLite compatible)
+
+CREATE TABLE IF NOT EXISTS users (
+  id SERIAL PRIMARY KEY,
+  email VARCHAR(255) UNIQUE NOT NULL,
+  password_hash VARCHAR(255) NOT NULL,
+  name VARCHAR(255),
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS watchlists (
+  id SERIAL PRIMARY KEY,
+  user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+  name VARCHAR(255) NOT NULL,
+  description TEXT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS watchlist_items (
+  id SERIAL PRIMARY KEY,
+  watchlist_id INTEGER REFERENCES watchlists(id) ON DELETE CASCADE,
+  ticker VARCHAR(10) NOT NULL,
+  added_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE(watchlist_id, ticker)
+);
+
+CREATE TABLE IF NOT EXISTS snapshots (
+  id SERIAL PRIMARY KEY,
+  ticker VARCHAR(10) NOT NULL,
+  price DECIMAL(12, 4) NOT NULL,
+  volume BIGINT NOT NULL,
+  pct_change_day DECIMAL(8, 4) NOT NULL,
+  high_52w DECIMAL(12, 4),
+  low_52w DECIMAL(12, 4),
+  ma_50d DECIMAL(12, 4),
+  timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_snapshots_ticker_time ON snapshots(ticker, timestamp);
+
+CREATE TABLE IF NOT EXISTS user_sessions (
+  id SERIAL PRIMARY KEY,
+  user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+  last_seen_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);

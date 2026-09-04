@@ -1,0 +1,25 @@
+{
+  "name": "pulse-market-watchlist",
+  "version": "1.0.0",
+  "description": "Pulse — A Smart Market Watchlist Triage Feed (Hackathon Submission)",
+  "scripts": {
+    "install:all": "cd backend && npm install && cd ../frontend && npm install",
+    "dev:backend": "cd backend && npm run dev",
+    "dev:frontend": "cd frontend && npm run dev",
+    "dev": "npx --yes concurrently -k \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "build": "cd frontend && npm run build",
+    "start": "cd backend && npm start",
+    "test": "cd backend && npm test",
+    "test:e2e": "cd backend && node e2e_test.js"
+  },
+  "keywords": [
+    "market",
+    "watchlist",
+    "triage",
+    "stocks",
+    "hackathon",
+    "attention-score"
+  ],
+  "author": "Pulse Team",
+  "license": "MIT"
+}

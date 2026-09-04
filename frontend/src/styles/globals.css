@@ -1,0 +1,243 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    background-color: #0A0E17;
+    color: #e2e8f0;
+    overflow-x: hidden;
+  }
+}
+
+/* Glassmorphism Card styling */
+.glass-card {
+  background: rgba(17, 24, 39, 0.65);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.5), inset 0 1px 0 0 rgba(255, 255, 255, 0.05);
+}
+
+.glass-card:hover {
+  border-color: rgba(20, 184, 166, 0.3);
+  box-shadow: 0 8px 30px -4px rgba(0, 0, 0, 0.6), 0 0 15px rgba(20, 184, 166, 0.1);
+}
+
+.glass-panel {
+  background: rgba(14, 19, 32, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+/* Accent Gradient Borders */
+.gradient-border-teal-violet {
+  position: relative;
+  background: linear-gradient(#0E1320, #0E1320) padding-box,
+              linear-gradient(135deg, rgba(20, 184, 166, 0.6), rgba(139, 92, 246, 0.6)) border-box;
+  border: 1px solid transparent;
+}
+
+/* Shimmer Loading Effect */
+.shimmer-bg {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.03) 0%,
+    rgba(255, 255, 255, 0.08) 50%,
+    rgba(255, 255, 255, 0.03) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.8s infinite;
+}
+
+/* Custom Sleek Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #0A0E17;
+}
+::-webkit-scrollbar-thumb {
+  background: #1e293b;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #334155;
+}
+
+/* Recharts path animations */
+.recharts-line-curve {
+  stroke-dasharray: 1000;
+  stroke-dashoffset: 1000;
+  animation: drawLine 1.4s ease-out forwards;
+}
+
+@keyframes drawLine {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* Print Stylesheet for Morning Memo PDF export */
+@media print {
+  body {
+    background-color: #ffffff !important;
+    color: #0f172a !important;
+  }
+  
+  header, nav, .no-print, [role="dialog"] > div:first-child {
+    display: none !important;
+  }
+
+  #printable-morning-memo {
+    background: #ffffff !important;
+    color: #0f172a !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+  }
+
+  #printable-morning-memo * {
+    color: #0f172a !important;
+    border-color: #e2e8f0 !important;
+    background-color: transparent !important;
+  }
+}
+
+/* ========================================================
+   THEME STYLING: GROWW EMERALD (LIGHT MODE)
+   ======================================================== */
+[data-theme="groww"] body,
+[data-theme="groww"] .bg-\[\#0A0E17\] {
+  background-color: #f8fafc !important;
+  color: #0f172a !important;
+}
+
+[data-theme="groww"] header {
+  background-color: rgba(255, 255, 255, 0.95) !important;
+  border-bottom-color: rgba(0, 0, 0, 0.08) !important;
+}
+
+[data-theme="groww"] .glass-card {
+  background: #ffffff !important;
+  border-color: rgba(0, 0, 0, 0.08) !important;
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.04) !important;
+}
+
+[data-theme="groww"] .glass-card:hover {
+  border-color: rgba(0, 208, 156, 0.4) !important;
+  box-shadow: 0 8px 30px -4px rgba(0, 0, 0, 0.1), 0 0 15px rgba(0, 208, 156, 0.12) !important;
+}
+
+[data-theme="groww"] .glass-panel {
+  background: #ffffff !important;
+  border-color: rgba(0, 0, 0, 0.08) !important;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03) !important;
+}
+
+[data-theme="groww"] .text-slate-100,
+[data-theme="groww"] .text-white {
+  color: #0f172a !important;
+}
+
+[data-theme="groww"] .text-slate-200,
+[data-theme="groww"] .text-slate-300 {
+  color: #1e293b !important;
+}
+
+[data-theme="groww"] .text-slate-400 {
+  color: #64748b !important;
+}
+
+[data-theme="groww"] .text-slate-500 {
+  color: #94a3b8 !important;
+}
+
+[data-theme="groww"] .bg-slate-900,
+[data-theme="groww"] .bg-slate-950,
+[data-theme="groww"] .bg-slate-950\/40 {
+  background-color: #f1f5f9 !important;
+}
+
+[data-theme="groww"] .bg-slate-800,
+[data-theme="groww"] .bg-slate-800\/80 {
+  background-color: #e2e8f0 !important;
+}
+
+[data-theme="groww"] .border-white\/5,
+[data-theme="groww"] .border-white\/10 {
+  border-color: rgba(0, 0, 0, 0.08) !important;
+}
+
+[data-theme="groww"] .text-teal-400,
+[data-theme="groww"] .text-teal-300 {
+  color: #00d09c !important;
+}
+
+[data-theme="groww"] .border-teal-500\/30,
+[data-theme="groww"] .border-teal-500\/40 {
+  border-color: rgba(0, 208, 156, 0.35) !important;
+}
+
+[data-theme="groww"] .bg-teal-500\/20,
+[data-theme="groww"] .bg-teal-500\/10 {
+  background-color: rgba(0, 208, 156, 0.12) !important;
+}
+
+/* ========================================================
+   THEME STYLING: BLOOMBERG AMBER TERMINAL (CRT MODE)
+   ======================================================== */
+[data-theme="bloomberg"] body,
+[data-theme="bloomberg"] .bg-\[\#0A0E17\] {
+  background-color: #050505 !important;
+  color: #fbbf24 !important;
+  font-family: 'Courier New', Courier, monospace !important;
+}
+
+[data-theme="bloomberg"] header {
+  background-color: #0c0800 !important;
+  border-bottom-color: #d97706 !important;
+}
+
+[data-theme="bloomberg"] .glass-card {
+  background: #0d0800 !important;
+  border: 1px solid #b45309 !important;
+  box-shadow: 0 0 10px rgba(245, 158, 11, 0.1) !important;
+}
+
+[data-theme="bloomberg"] .glass-panel {
+  background: #0a0600 !important;
+  border: 1px solid #92400e !important;
+}
+
+[data-theme="bloomberg"] .text-slate-100,
+[data-theme="bloomberg"] .text-slate-200,
+[data-theme="bloomberg"] .text-white {
+  color: #fef3c7 !important;
+}
+
+[data-theme="bloomberg"] .text-slate-300,
+[data-theme="bloomberg"] .text-slate-400 {
+  color: #fbbf24 !important;
+}
+
+[data-theme="bloomberg"] .text-slate-500 {
+  color: #d97706 !important;
+}
+
+[data-theme="bloomberg"] .text-teal-400,
+[data-theme="bloomberg"] .text-teal-300 {
+  color: #f59e0b !important;
+}
+
+[data-theme="bloomberg"] .border-teal-500\/30,
+[data-theme="bloomberg"] .border-teal-500\/20 {
+  border-color: #f59e0b !important;
+}
+
+[data-theme="bloomberg"] .bg-teal-500\/20,
+[data-theme="bloomberg"] .bg-teal-500\/10 {
+  background-color: rgba(245, 158, 11, 0.15) !important;
+}
