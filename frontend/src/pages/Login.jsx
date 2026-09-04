@@ -97,7 +97,7 @@ export default function Login({ onNavigateSignup, onNavigateLanding }) {
 
         <Button variant="secondary" onClick={handleGuest} className="w-full" isLoading={loading}>
           <Zap className="w-3.5 h-3.5 text-teal-400" />
-          1-Click Instant Guest Demo Session
+          1-Click Instant Trader Access
         </Button>
 
         <p className="text-center text-xs text-slate-400">

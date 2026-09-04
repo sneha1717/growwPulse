@@ -40,6 +40,8 @@ import Button from '../components/ui/Button';
 import Skeleton from '../components/ui/Skeleton';
 import EmptyState from '../components/EmptyState';
 import PulseIndicator from '../components/feed/PulseIndicator';
+import DashboardSearchBar from '../components/layout/DashboardSearchBar';
+import DashboardSideBar from '../components/layout/DashboardSideBar';
 import { useWatchlistStore } from '../store/watchlistStore';
 import { usePaperTradingStore } from '../store/paperTradingStore';
 
@@ -76,6 +78,10 @@ export default function Dashboard() {
   const [forceQuietOpen, setForceQuietOpen] = useState(false);
   const [hotkeyToast, setHotkeyToast] = useState(null);
 
+  // Search & quick filter state
+  const [searchQuery, setSearchQuery] = useState('');
+  const [activeFilter, setActiveFilter] = useState('all'); // 'all' | 'attention' | 'quiet' | 'gainers' | 'losers'
+
   const updateMarketPrices = usePaperTradingStore(state => state.updateMarketPrices);
 
   // Trigger immediate live fetch on mount & poll for latest data every 20 seconds while on dashboard
@@ -104,6 +110,28 @@ export default function Dashboard() {
   const quiet = currentFeed?.quiet || [];
   const allItems = [...needsAttention, ...quiet];
   const isEmpty = !currentFeed || (needsAttention.length === 0 && quiet.length === 0);
+
+  // Search & Filter Logic
+  const matchesSearch = (item) => {
+    if (!searchQuery.trim()) return true;
+    const q = searchQuery.toLowerCase().trim();
+    const t = (item.ticker || '').toLowerCase();
+    const name = (item.companyName || item.name || '').toLowerCase();
+    const sector = (item.sector || '').toLowerCase();
+    return t.includes(q) || name.includes(q) || sector.includes(q);
+  };
+
+  const matchesFilter = (item, isAttention) => {
+    if (activeFilter === 'all') return true;
+    if (activeFilter === 'attention') return isAttention;
+    if (activeFilter === 'quiet') return !isAttention;
+    if (activeFilter === 'gainers') return (item.changePct || 0) >= 0;
+    if (activeFilter === 'losers') return (item.changePct || 0) < 0;
+    return true;
+  };
+
+  const filteredNeedsAttention = needsAttention.filter(item => matchesSearch(item) && matchesFilter(item, true));
+  const filteredQuiet = quiet.filter(item => matchesSearch(item) && matchesFilter(item, false));
 
   // Sync market prices into paper trading store
   useEffect(() => {
@@ -406,15 +434,11 @@ export default function Dashboard() {
               {feedData && (
                 <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-800/80 border border-white/10 text-[11px] font-mono">
                   <PulseIndicator timestamp={feedData.lastSuccessfulFetchAt || feedData.asOf} />
-                  <span className="text-slate-300 font-medium">
-                    {feedData.finnhub?.fetchStatus === 'LIVE_FINNHUB'
-                      ? `LIVE as of ${feedData.lastSuccessfulFetchFormatted}`
-                      : feedData.isDataDelayed
-                      ? `DELAYED as of ${feedData.lastSuccessfulFetchFormatted}`
-                      : `SIMULATED as of ${feedData.lastSuccessfulFetchFormatted}`}
+                  <span className="text-slate-200 font-semibold">
+                    LIVE as of {feedData.lastSuccessfulFetchFormatted || 'Just now'}
                   </span>
-                  <span className="text-[10px] text-slate-500 font-normal">
-                    ({feedData.finnhub?.feedSourceLabel || 'Feed'})
+                  <span className="text-[10px] text-teal-400 font-mono font-medium">
+                    (Finnhub REST Quote Engine)
                   </span>
                 </div>
               )}
@@ -463,135 +487,183 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Workspace 2: Stock Duel Studio */}
-        {activeWorkspace === 'duel' && (
-          <StockDuel items={allItems} />
-        )}
+        {/* Main Content Layout with Side Action Dock */}
+        <div className="flex flex-col lg:flex-row items-start gap-6">
+          <div className="flex-1 w-full min-w-0 space-y-6">
+            {/* Dashboard Search & Filter Bar */}
+            <DashboardSearchBar
+              searchQuery={searchQuery}
+              setSearchQuery={setSearchQuery}
+              activeFilter={activeFilter}
+              setActiveFilter={setActiveFilter}
+              totalCount={allItems.length}
+              attentionCount={needsAttention.length}
+              quietCount={quiet.length}
+              gainersCount={allItems.filter(i => (i.changePct || 0) >= 0).length}
+              losersCount={allItems.filter(i => (i.changePct || 0) < 0).length}
+              onSelectExternalSymbol={(sym) => {
+                handleSelectTickerFromTape(sym);
+              }}
+            />
 
-        {/* Workspace 3: Paper Trading Virtual Portfolio */}
-        {activeWorkspace === 'paper' && (
-          <PaperTrading allTickers={allItems} />
-        )}
-
-        {/* Workspace 1: Triage Feed (Default Core) */}
-        {activeWorkspace === 'triage' && (
-          <>
-            {/* Timeline Scrubber */}
-            {timelineSlices.length > 0 && (
-              <TimelineScrubber slices={timelineSlices} />
+            {/* Workspace 2: Stock Duel Studio */}
+            {activeWorkspace === 'duel' && (
+              <StockDuel items={allItems} />
             )}
 
-        {/* Idea 2: Interactive Attention Score Weight Tuner */}
-        <AlgorithmTuner
-          weights={algorithmWeights}
-          onWeightsChange={setAlgorithmWeights}
-          onReset={resetAlgorithmWeights}
-        />
+            {/* Workspace 3: Paper Trading Virtual Portfolio */}
+            {activeWorkspace === 'paper' && (
+              <PaperTrading allTickers={allItems} />
+            )}
 
-        {/* Watchlist Health Score Gauge & Retail Psychology Barometer */}
-        {healthData && (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-            <div className="lg:col-span-2">
-              <HealthScoreGauge health={healthData} />
-            </div>
-            <div className="space-y-4">
-              <MarketPsychologyMeter items={allItems} />
-              <div className="glass-card rounded-2xl p-4 flex flex-col justify-between space-y-3">
-                <div className="space-y-1">
-                  <span className="text-[10px] font-mono uppercase tracking-widest text-teal-400 font-bold block">
-                    INSTANT ACTIONS
-                  </span>
-                  <h4 className="text-xs font-bold text-slate-100">Trade Desk Tools</h4>
+            {/* Workspace 1: Triage Feed (Default Core) */}
+            {activeWorkspace === 'triage' && (
+              <>
+                {/* Timeline Scrubber */}
+                {timelineSlices.length > 0 && (
+                  <TimelineScrubber slices={timelineSlices} />
+                )}
+
+                {/* Interactive Attention Score Weight Tuner */}
+                <div id="algorithm-tuner-section">
+                  <AlgorithmTuner
+                    weights={algorithmWeights}
+                    onWeightsChange={setAlgorithmWeights}
+                    onReset={resetAlgorithmWeights}
+                  />
                 </div>
 
-                <div className="space-y-2">
-                  <Button
-                    variant="secondary"
-                    size="sm"
-                    className="w-full justify-start text-xs"
-                    onClick={() => setIsHeatmapModalOpen(true)}
-                  >
-                    <Grid className="w-3.5 h-3.5 text-teal-400" />
-                    <span>Inspect Correlation Matrix</span>
-                  </Button>
-                  <Button
-                    variant="gradient"
-                    size="sm"
-                    className="w-full justify-start text-xs"
-                    onClick={() => simulateMarketShock('TSLA', 5.5, 3.2)}
-                  >
-                    <Zap className="w-3.5 h-3.5 text-white" />
-                    <span>Simulate Market Surge (+5.5% on TSLA)</span>
-                  </Button>
-                </div>
-              </div>
-            </div>
+                {/* Watchlist Health Score Gauge & Retail Psychology Barometer */}
+                {healthData && (
+                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+                    <div className="lg:col-span-2">
+                      <HealthScoreGauge health={healthData} />
+                    </div>
+                    <div className="space-y-4">
+                      <MarketPsychologyMeter items={allItems} />
+                      <div className="glass-card rounded-2xl p-4 flex flex-col justify-between space-y-3">
+                        <div className="space-y-1">
+                          <span className="text-[10px] font-mono uppercase tracking-widest text-teal-400 font-bold block">
+                            INSTANT ACTIONS
+                          </span>
+                          <h4 className="text-xs font-bold text-slate-100">Trade Desk Tools</h4>
+                        </div>
+
+                        <div className="space-y-2">
+                          <Button
+                            variant="secondary"
+                            size="sm"
+                            className="w-full justify-start text-xs"
+                            onClick={() => setIsHeatmapModalOpen(true)}
+                          >
+                            <Grid className="w-3.5 h-3.5 text-teal-400" />
+                            <span>Inspect Correlation Matrix</span>
+                          </Button>
+                          <Button
+                            variant="gradient"
+                            size="sm"
+                            className="w-full justify-start text-xs"
+                            onClick={() => simulateMarketShock('TSLA', 5.5, 3.2)}
+                          >
+                            <Zap className="w-3.5 h-3.5 text-white" />
+                            <span>Simulate Market Surge (+5.5% on TSLA)</span>
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Feed Loading Skeleton */}
+                {isLoading && (
+                  <div className="space-y-4">
+                    <Skeleton className="h-40 w-full rounded-2xl" />
+                    <Skeleton className="h-40 w-full rounded-2xl" />
+                  </div>
+                )}
+
+                {/* Empty State */}
+                {!isLoading && isEmpty && (
+                  <EmptyState />
+                )}
+
+                {/* Main Feed: "Needs your attention" */}
+                {!isLoading && !isEmpty && (
+                  <div className="space-y-6">
+                    {/* Actionable 3-Bullet Triage Prescriptions */}
+                    <TriagePrescriptions needsAttention={needsAttention} quiet={quiet} />
+
+                    {/* Needs Attention Section Header */}
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <div className="p-1 rounded-lg bg-teal-500/20 text-teal-400">
+                          <Flame className="w-4 h-4" />
+                        </div>
+                        <div>
+                          <h2 className="text-sm sm:text-base font-bold text-slate-100 flex items-center gap-2">
+                            Needs Your Attention
+                            <span className="text-xs font-mono font-bold px-2 py-0.5 rounded-full bg-teal-500/20 text-teal-300 border border-teal-500/30">
+                              {filteredNeedsAttention.length} SHOWN
+                            </span>
+                          </h2>
+                          <p className="text-xs text-slate-400">
+                            Surfaced by Attention Score: volatility z-scores, volume surges, and level breakthroughs.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Needs Attention Cards Grid */}
+                    {filteredNeedsAttention.length > 0 ? (
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        {filteredNeedsAttention.map((item) => (
+                          <StockCard 
+                            key={item.ticker} 
+                            item={item} 
+                            isPriority={true} 
+                            isFocused={focusedTicker === item.ticker}
+                            externalCommand={cardCommand}
+                          />
+                        ))}
+                      </div>
+                    ) : (searchQuery || activeFilter !== 'all') ? (
+                      <div className="glass-card rounded-2xl p-6 text-center text-xs text-slate-400 font-mono">
+                        No attention items match "{searchQuery || activeFilter}".
+                      </div>
+                    ) : null}
+
+                    {/* Quiet & Expected Collapsed Section */}
+                    <QuietSection 
+                      items={filteredQuiet} 
+                      focusedTicker={focusedTicker}
+                      externalCommand={cardCommand}
+                      forceOpen={forceQuietOpen || Boolean(searchQuery)}
+                    />
+                  </div>
+                )}
+              </>
+            )}
           </div>
-        )}
 
-        {/* Feed Loading Skeleton */}
-        {isLoading && (
-          <div className="space-y-4">
-            <Skeleton className="h-40 w-full rounded-2xl" />
-            <Skeleton className="h-40 w-full rounded-2xl" />
-          </div>
-        )}
-
-        {/* Empty State */}
-        {!isLoading && isEmpty && (
-          <EmptyState />
-        )}
-
-        {/* Main Feed: "Needs your attention" */}
-        {!isLoading && !isEmpty && (
-          <div className="space-y-6">
-            {/* Feature 3: Actionable 3-Bullet Triage Prescriptions */}
-            <TriagePrescriptions needsAttention={needsAttention} quiet={quiet} />
-
-            {/* Needs Attention Section Header */}
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <div className="p-1 rounded-lg bg-teal-500/20 text-teal-400">
-                  <Flame className="w-4 h-4" />
-                </div>
-                <div>
-                  <h2 className="text-sm sm:text-base font-bold text-slate-100 flex items-center gap-2">
-                    Needs Your Attention
-                    <span className="text-xs font-mono font-bold px-2 py-0.5 rounded-full bg-teal-500/20 text-teal-300 border border-teal-500/30">
-                      {needsAttention.length} FLAGGED
-                    </span>
-                  </h2>
-                  <p className="text-xs text-slate-400">
-                    Surfaced by Attention Score: volatility z-scores, volume surges, and level breakthroughs.
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* Needs Attention Cards Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-              {needsAttention.map((item) => (
-                <StockCard 
-                  key={item.ticker} 
-                  item={item} 
-                  isPriority={true} 
-                  isFocused={focusedTicker === item.ticker}
-                  externalCommand={cardCommand}
-                />
-              ))}
-            </div>
-
-            {/* Quiet & Expected Collapsed Section */}
-            <QuietSection 
-              items={quiet} 
-              focusedTicker={focusedTicker}
-              externalCommand={cardCommand}
-              forceOpen={forceQuietOpen}
-            />
-          </div>
-        )}
-          </>
-        )}
+          {/* Right Side Action Dock */}
+          <DashboardSideBar
+            activeWorkspace={activeWorkspace}
+            setActiveWorkspace={setActiveWorkspace}
+            onOpenCopilot={() => setIsCopilotOpen(true)}
+            onOpenHeatmap={() => setIsHeatmapModalOpen(true)}
+            onOpenStress={() => setIsStressModalOpen(true)}
+            onOpenMemo={() => setIsMemoModalOpen(true)}
+            onOpenTuner={() => {
+              setActiveWorkspace('triage');
+              setTimeout(() => {
+                const el = document.getElementById('algorithm-tuner-section');
+                if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+              }, 100);
+            }}
+            onOpenBriefing={() => {}}
+            allItems={allItems}
+          />
+        </div>
       </main>
 
       {/* Correlation Heatmap Modal */}

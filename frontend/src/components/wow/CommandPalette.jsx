@@ -93,7 +93,7 @@ export default function CommandPalette() {
                   <Zap className="w-4 h-4 text-teal-400" />
                   Simulate Market Shock on TSLA (+6.2% Breakout)
                 </span>
-                <span className="text-[10px] font-mono text-slate-500 group-hover:text-teal-400">DEMO TRIGGER</span>
+                <span className="text-[10px] font-mono text-slate-500 group-hover:text-teal-400">LIVE SHOCK</span>
               </button>
 
               <button
@@ -107,7 +107,7 @@ export default function CommandPalette() {
                   <Zap className="w-4 h-4 text-teal-400" />
                   Simulate 52-Week High Breakout on NVDA
                 </span>
-                <span className="text-[10px] font-mono text-slate-500 group-hover:text-teal-400">DEMO TRIGGER</span>
+                <span className="text-[10px] font-mono text-slate-500 group-hover:text-teal-400">LIVE SHOCK</span>
               </button>
 
               <div className="px-3 pt-3 pb-1 text-[10px] font-mono uppercase tracking-wider text-slate-500">

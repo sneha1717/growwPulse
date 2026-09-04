@@ -1,6 +1,20 @@
-# Pulse — A Smart Market Watchlist Triage Feed
-> **Hackathon Submission:** CODE 2026 — u/earth by grow  
-> **Pitch:** Most watchlists are spreadsheets with tickers. Pulse is a **triage feed** — it tells you the 2-3 things that actually deserve your attention today, explains *why* in plain English, and animates the story of what happened since you left. Everything else stays quiet on purpose.
+# Pulse — The Intelligent Market Watchlist Triage Suite
+
+[![Live Production](https://img.shields.io/badge/Production-groww--pulse--beta.vercel.app-14b8a6?style=for-the-badge&logo=vercel&logoColor=white)](https://groww-pulse-beta.vercel.app)
+[![GitHub Repository](https://img.shields.io/badge/GitHub-sneha1717%2FgrowwPulse-10b981?style=for-the-badge&logo=github&logoColor=white)](https://github.com/sneha1717/growwPulse.git)
+[![Live Finnhub API](https://img.shields.io/badge/Finnhub-Live_Quote_Engine-06b6d4?style=for-the-badge&logo=financialtimes&logoColor=white)](https://finnhub.io)
+[![License: MIT](https://img.shields.io/badge/License-MIT-violet?style=for-the-badge)](LICENSE)
+
+> **Submission for CODE 2026 — u/earth by grow**  
+> **Core Pitch:** Most watchlists are spreadsheets with tickers. Pulse is an institutional **triage feed** — it isolates the 2-3 things that actually deserve your attention today, explains *why* in plain English, and keeps everything else quiet on purpose.
+
+---
+
+## 🌐 Live Web App & Deployment
+
+* 🚀 **Production URL**: **[https://groww-pulse-beta.vercel.app](https://groww-pulse-beta.vercel.app)**
+* 💻 **GitHub Repo**: **[https://github.com/sneha1717/growwPulse.git](https://github.com/sneha1717/growwPulse.git)**
+* 🟢 **Live Market Execution**: Powered by direct client-to-Finnhub REST API integration with real-time quotes, symbol lookup, and financial wire news.
 
 ---
 
@@ -47,6 +61,9 @@ Where:
 
 | Feature | Description |
 |---|---|
+| **🔍 Live Ticker Search & Filter Bar** | **New Interface**: Real-time ticker, company name, and sector search with hotkey `/`, Finnhub auto-suggest dropdown, and 1-click filter chips (`All`, `Needs Attention`, `Quiet`, `Gainers`, `Losers`). |
+| **⚡ Dashboard Quick Action Dock** | **New Navigation Dock**: Collapsible side option bar with 1-click workspace switching, live Market Breadth ratio bar, Finnhub latency ping, and breaking market wire headlines. |
+| **📊 Pearson Correlation Heatmap** | **Quantitative Matrix**: Pairwise co-movement grid across all watchlist assets with hover inspector, Strongest Co-Movement pair, Top Diversifier / Hedge, and mean portfolio correlation. |
 | **⚔️ Stock Duel Studio** | **New Workspace**: Interactive head-to-head factor battle (returns, z-score, volume anomaly, FII flow, correlation spread, and automated triage verdict). |
 | **💼 ₹10L Paper Trading Desk** | **New Workspace**: Virtual portfolio simulator with real-time mark-to-market P&L, 1-click order tickets, and live Alpha vs Benchmark tracker. |
 | **🤖 AI Trade Desk Co-Pilot** | **New Assistant**: Slide-over terminal analyst with quick chips (*"Why is TSLA flagged?"*, *"Suggest best hedge against rate hike"*). |

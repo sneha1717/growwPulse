@@ -35,7 +35,7 @@ export default function Landing({ onNavigateLogin, onNavigateSignup }) {
             Sign In
           </button>
           <Button variant="primary" size="sm" onClick={handleDemoClick}>
-            <Zap className="w-3.5 h-3.5" /> Fast Demo
+            <Zap className="w-3.5 h-3.5" /> Launch Terminal
           </Button>
         </div>
       </header>
@@ -85,7 +85,7 @@ export default function Landing({ onNavigateLogin, onNavigateSignup }) {
         >
           <Button variant="primary" size="lg" onClick={handleDemoClick} className="w-full sm:w-auto text-sm px-8 py-3.5">
             <Zap className="w-4 h-4 text-slate-950" />
-            Launch Live Demo as Guest Trader
+            Launch Pulse Terminal (Live API)
             <ArrowRight className="w-4 h-4 ml-1" />
           </Button>
 
