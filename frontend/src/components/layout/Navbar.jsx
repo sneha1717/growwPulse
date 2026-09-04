@@ -60,6 +60,7 @@ export default function Navbar({
   const [isApiKeyModalOpen, setIsApiKeyModalOpen] = useState(false);
   const [isToolsOpen, setIsToolsOpen] = useState(false);
   const [newWlName, setNewWlName] = useState('');
+  const [newWlDesc, setNewWlDesc] = useState('');
   const activeWatchlist = watchlists.find(w => w.id === activeWatchlistId) || { name: 'Select Watchlist' };
 
   useEffect(() => {
