@@ -16,7 +16,10 @@ import {
   Swords,
   Briefcase,
   Bot,
-  Key
+  Key,
+  Radar,
+  Volume2,
+  VolumeX
 } from 'lucide-react';
 import Button from '../ui/Button';
 import Modal from '../ui/Modal';
@@ -26,6 +29,7 @@ import ApiKeyModal from './ApiKeyModal';
 import BottomNav from './BottomNav';
 import { useAuthStore } from '../../store/authStore';
 import { useWatchlistStore } from '../../store/watchlistStore';
+import { playCyberClick, playSuccessChime, isSoundMuted, toggleSoundMute } from '../../utils/soundFx';
 
 export default function Navbar({ 
   activeWorkspace = 'triage', 
@@ -37,6 +41,7 @@ export default function Navbar({
   onOpenCopilot
 }) {
   const { user, logout } = useAuthStore();
+  const [soundMutedState, setSoundMutedState] = useState(isSoundMuted());
   const { 
     watchlists, 
     activeWatchlistId, 
@@ -174,7 +179,7 @@ export default function Navbar({
             </button>
 
             <button
-              onClick={() => setActiveWorkspace && setActiveWorkspace('paper')}
+              onClick={() => { playCyberClick(); setActiveWorkspace && setActiveWorkspace('paper'); }}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-all ${
                 activeWorkspace === 'paper'
                   ? 'bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-500/30 shadow-sm'
@@ -183,6 +188,19 @@ export default function Navbar({
             >
               <Briefcase className="w-3.5 h-3.5 text-emerald-400" />
               <span>Paper Trader</span>
+            </button>
+
+            <button
+              onClick={() => { playCyberClick(); setActiveWorkspace && setActiveWorkspace('pro'); }}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-all ${
+                activeWorkspace === 'pro'
+                  ? 'bg-indigo-500/20 text-indigo-300 font-bold border border-indigo-500/30 shadow-sm'
+                  : 'text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              <Radar className="w-3.5 h-3.5 text-indigo-400" />
+              <span>Whale Radar</span>
+              <span className="px-1 py-0.2 rounded bg-indigo-500/30 text-[9px] font-mono text-indigo-200 font-bold">PRO</span>
             </button>
           </div>
 
@@ -262,6 +280,23 @@ export default function Navbar({
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
               <Key className="w-3.5 h-3.5 text-amber-400" />
               <span className="hidden sm:inline font-mono">Live API</span>
+            </button>
+
+            {/* Audio Sound FX Mute / Unmute Toggle */}
+            <button
+              onClick={() => {
+                const nextMuted = toggleSoundMute();
+                setSoundMutedState(nextMuted);
+                if (!nextMuted) playSuccessChime();
+              }}
+              className="p-2 rounded-xl glass-panel hover:bg-slate-800 text-slate-300 border border-white/10 transition-all"
+              title={soundMutedState ? 'Unmute Sound Effects' : 'Mute Sound Effects'}
+            >
+              {soundMutedState ? (
+                <VolumeX className="w-4 h-4 text-slate-500" />
+              ) : (
+                <Volume2 className="w-4 h-4 text-teal-400" />
+              )}
             </button>
 
             {/* Display Theme Switcher: Midnight Cyber / Groww Emerald / Bloomberg Amber */}

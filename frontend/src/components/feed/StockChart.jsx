@@ -5,13 +5,17 @@ import {
   Area,
   BarChart,
   Bar,
+  LineChart,
+  Line,
+  ReferenceLine,
   XAxis,
   YAxis,
   Tooltip
 } from 'recharts';
-import { BarChart2, CandlestickChart, TrendingUp, TrendingDown, Clock } from 'lucide-react';
+import { BarChart2, CandlestickChart, TrendingUp, TrendingDown, Clock, Activity, Zap } from 'lucide-react';
 import { api } from '../../api/client';
 import Skeleton from '../ui/Skeleton';
+import { playCyberClick } from '../../utils/soundFx';
 
 function generateFallbackCandles(ticker, basePrice = 150, days = 30) {
   const points = [];
@@ -118,6 +122,53 @@ export default function StockChart({
     return data;
   }, [data, timeframe]);
 
+  // Compute 14-period RSI
+  const rsiData = useMemo(() => {
+    if (!filteredData || filteredData.length === 0) return [];
+    let avgGain = 0;
+    let avgLoss = 0;
+    return filteredData.map((d, i) => {
+      if (i === 0) return { ...d, rsi: 50 };
+      const change = d.price - filteredData[i - 1].price;
+      const gain = Math.max(0, change);
+      const loss = Math.max(0, -change);
+      if (i === 1) {
+        avgGain = gain;
+        avgLoss = loss;
+      } else {
+        avgGain = (avgGain * 13 + gain) / 14;
+        avgLoss = (avgLoss * 13 + loss) / 14;
+      }
+      const rs = avgLoss === 0 ? 100 : avgGain / avgLoss;
+      const rsi = parseFloat((100 - (100 / (1 + rs))).toFixed(1));
+      return { ...d, rsi };
+    });
+  }, [filteredData]);
+
+  // Compute MACD (12 EMA - 26 EMA, 9 Signal)
+  const macdData = useMemo(() => {
+    if (!filteredData || filteredData.length === 0) return [];
+    let ema12 = filteredData[0]?.price || 100;
+    let ema26 = filteredData[0]?.price || 100;
+    let signal = 0;
+    const k12 = 2 / 13;
+    const k26 = 2 / 27;
+    const k9 = 2 / 10;
+    return filteredData.map((d) => {
+      ema12 = d.price * k12 + ema12 * (1 - k12);
+      ema26 = d.price * k26 + ema26 * (1 - k26);
+      const macd = ema12 - ema26;
+      signal = macd * k9 + signal * (1 - k9);
+      const hist = parseFloat((macd - signal).toFixed(2));
+      return {
+        ...d,
+        macd: parseFloat(macd.toFixed(2)),
+        signal: parseFloat(signal.toFixed(2)),
+        hist
+      };
+    });
+  }, [filteredData]);
+
   if (isLoading) {
     return (
       <div className="h-44 w-full py-4 min-w-0">
@@ -160,7 +211,7 @@ export default function StockChart({
         {/* Timeframe selector */}
         <div className="flex items-center gap-1 p-0.5 rounded-lg bg-slate-900 border border-white/5">
           <button
-            onClick={() => setTimeframe('7d')}
+            onClick={() => { playCyberClick(); setTimeframe('7d'); }}
             className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold transition-colors ${
               timeframe === '7d' ? 'bg-teal-500/20 text-teal-300' : 'text-slate-400 hover:text-slate-200'
             }`}
@@ -168,7 +219,7 @@ export default function StockChart({
             7D
           </button>
           <button
-            onClick={() => setTimeframe('15d')}
+            onClick={() => { playCyberClick(); setTimeframe('15d'); }}
             className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold transition-colors ${
               timeframe === '15d' ? 'bg-teal-500/20 text-teal-300' : 'text-slate-400 hover:text-slate-200'
             }`}
@@ -176,7 +227,7 @@ export default function StockChart({
             15D
           </button>
           <button
-            onClick={() => setTimeframe('30d')}
+            onClick={() => { playCyberClick(); setTimeframe('30d'); }}
             className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold transition-colors ${
               timeframe === '30d' ? 'bg-teal-500/20 text-teal-300' : 'text-slate-400 hover:text-slate-200'
             }`}
@@ -194,27 +245,39 @@ export default function StockChart({
           </span>
         </div>
 
-        {/* Chart Mode Controls */}
+        {/* Chart Mode Controls (Area, Candle, RSI, MACD) */}
         <div className="flex items-center gap-1 p-0.5 rounded-lg bg-slate-900 border border-white/5">
           <button
-            onClick={() => setChartMode('area')}
-            className={`flex items-center gap-1 px-2.5 py-1 rounded text-[11px] font-medium transition-colors ${
-              chartMode === 'area'
-                ? 'bg-teal-500/20 text-teal-300 font-bold'
-                : 'text-slate-400 hover:text-slate-200'
+            onClick={() => { playCyberClick(); setChartMode('area'); }}
+            className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold transition-colors ${
+              chartMode === 'area' ? 'bg-teal-500 text-slate-950 shadow-sm' : 'text-slate-400 hover:text-white'
             }`}
           >
-            <BarChart2 className="w-3 h-3" /> Area
+            Area
           </button>
           <button
-            onClick={() => setChartMode('candle')}
-            className={`flex items-center gap-1 px-2.5 py-1 rounded text-[11px] font-medium transition-colors ${
-              chartMode === 'candle'
-                ? 'bg-teal-500/20 text-teal-300 font-bold'
-                : 'text-slate-400 hover:text-slate-200'
+            onClick={() => { playCyberClick(); setChartMode('candle'); }}
+            className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold transition-colors ${
+              chartMode === 'candle' ? 'bg-teal-500 text-slate-950 shadow-sm' : 'text-slate-400 hover:text-white'
             }`}
           >
-            <CandlestickChart className="w-3 h-3" /> Candlesticks
+            OHLC
+          </button>
+          <button
+            onClick={() => { playCyberClick(); setChartMode('rsi'); }}
+            className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold transition-colors ${
+              chartMode === 'rsi' ? 'bg-cyan-500 text-slate-950 shadow-sm' : 'text-slate-400 hover:text-white'
+            }`}
+          >
+            RSI
+          </button>
+          <button
+            onClick={() => { playCyberClick(); setChartMode('macd'); }}
+            className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold transition-colors ${
+              chartMode === 'macd' ? 'bg-indigo-500 text-slate-950 shadow-sm' : 'text-slate-400 hover:text-white'
+            }`}
+          >
+            MACD
           </button>
         </div>
       </div>
@@ -330,6 +393,85 @@ export default function StockChart({
             <span className="text-teal-400">● Bullish Candle  ■ Bearish Candle</span>
             <span>{filteredData[filteredData.length - 1]?.date}</span>
           </div>
+        </div>
+      )}
+
+      {/* Mode 3: RSI (14) Indicator */}
+      {chartMode === 'rsi' && (
+        <div className="h-44 w-full min-w-0 space-y-1">
+          <div className="flex items-center justify-between text-[11px] font-mono px-2">
+            <span className="text-slate-400">Relative Strength Index (14):</span>
+            <span className={`font-bold ${
+              (rsiData[rsiData.length - 1]?.rsi || 50) > 70 ? 'text-rose-400' :
+              (rsiData[rsiData.length - 1]?.rsi || 50) < 30 ? 'text-emerald-400' : 'text-cyan-300'
+            }`}>
+              RSI {rsiData[rsiData.length - 1]?.rsi || 50} 
+              <span className="text-[10px] text-slate-400 ml-1">
+                {(rsiData[rsiData.length - 1]?.rsi || 50) > 70 ? '(Overbought)' :
+                 (rsiData[rsiData.length - 1]?.rsi || 50) < 30 ? '(Oversold)' : '(Neutral Zone)'}
+              </span>
+            </span>
+          </div>
+          <ResponsiveContainer width="100%" height={150} minWidth={0} minHeight={150}>
+            <LineChart data={rsiData} margin={{ top: 10, right: 10, left: -25, bottom: 0 }}>
+              <XAxis dataKey="date" stroke="#475569" tick={{ fill: '#64748b', fontSize: 10 }} tickLine={false} axisLine={false} />
+              <YAxis domain={[0, 100]} stroke="#475569" tick={{ fill: '#64748b', fontSize: 10 }} tickLine={false} axisLine={false} ticks={[30, 50, 70]} />
+              <ReferenceLine y={70} stroke="#f43f5e" strokeDasharray="3 3" />
+              <ReferenceLine y={30} stroke="#10b981" strokeDasharray="3 3" />
+              <Tooltip
+                content={({ active, payload }) => {
+                  if (active && payload && payload.length) {
+                    const d = payload[0].payload;
+                    return (
+                      <div className="glass-panel px-3 py-1.5 rounded-lg text-xs shadow-xl border border-white/10 font-mono">
+                        <p className="text-slate-400 text-[10px]">{d.date}</p>
+                        <p className="font-bold text-cyan-300">RSI: {d.rsi}</p>
+                      </div>
+                    );
+                  }
+                  return null;
+                }}
+              />
+              <Line type="monotone" dataKey="rsi" stroke="#06b6d4" strokeWidth={2} dot={false} isAnimationActive={true} />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+      )}
+
+      {/* Mode 4: MACD Indicator */}
+      {chartMode === 'macd' && (
+        <div className="h-44 w-full min-w-0 space-y-1">
+          <div className="flex items-center justify-between text-[11px] font-mono px-2">
+            <span className="text-slate-400">MACD (12, 26, 9):</span>
+            <span className="text-indigo-300 font-bold">
+              Hist: {macdData[macdData.length - 1]?.hist >= 0 ? '+' : ''}{macdData[macdData.length - 1]?.hist}
+            </span>
+          </div>
+          <ResponsiveContainer width="100%" height={150} minWidth={0} minHeight={150}>
+            <BarChart data={macdData} margin={{ top: 10, right: 10, left: -25, bottom: 0 }}>
+              <XAxis dataKey="date" stroke="#475569" tick={{ fill: '#64748b', fontSize: 10 }} tickLine={false} axisLine={false} />
+              <YAxis stroke="#475569" tick={{ fill: '#64748b', fontSize: 10 }} tickLine={false} axisLine={false} />
+              <Tooltip
+                content={({ active, payload }) => {
+                  if (active && payload && payload.length) {
+                    const d = payload[0].payload;
+                    return (
+                      <div className="glass-panel px-3 py-1.5 rounded-lg text-xs shadow-xl border border-white/10 font-mono">
+                        <p className="text-slate-400 text-[10px]">{d.date}</p>
+                        <p className="text-teal-300">MACD: {d.macd}</p>
+                        <p className="text-amber-300">Signal: {d.signal}</p>
+                        <p className={d.hist >= 0 ? 'text-emerald-400 font-bold' : 'text-rose-400 font-bold'}>
+                          Hist: {d.hist}
+                        </p>
+                      </div>
+                    );
+                  }
+                  return null;
+                }}
+              />
+              <Bar dataKey="hist" fill="#6366f1" radius={[1, 1, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
         </div>
       )}
 

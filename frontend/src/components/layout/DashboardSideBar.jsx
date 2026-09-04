@@ -155,6 +155,23 @@ export default function DashboardSideBar({
                   <Bot className="w-3.5 h-3.5 text-violet-400 group-hover:rotate-12 transition-transform" />
                   <span>AI Co-Pilot</span>
                 </button>
+
+                <button
+                  onClick={() => setActiveWorkspace('pro')}
+                  className={`col-span-2 flex items-center justify-between px-3 py-2 rounded-xl text-xs font-bold transition-all text-left ${
+                    activeWorkspace === 'pro'
+                      ? 'bg-indigo-500/20 text-indigo-200 border border-indigo-500/40 shadow-sm'
+                      : 'bg-indigo-950/20 hover:bg-indigo-900/40 text-indigo-300 border border-indigo-500/20'
+                  }`}
+                >
+                  <span className="flex items-center gap-2">
+                    <Radio className="w-3.5 h-3.5 text-indigo-400 animate-pulse" />
+                    <span>Whale & Dark Pool Terminal</span>
+                  </span>
+                  <span className="text-[9px] font-mono font-black px-1.5 py-0.5 rounded bg-indigo-500/30 text-indigo-200 border border-indigo-500/30">
+                    PRO ↗
+                  </span>
+                </button>
               </div>
 
               {/* High-Impact Analytics Launchers */}

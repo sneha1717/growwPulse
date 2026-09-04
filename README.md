@@ -47,13 +47,14 @@ Where:
 
 ---
 
-## 🚀 The 3 Workspaces & Key Features
+## 🚀 The 4 Institutional Workspaces & Key Features
 
 ### 🏢 Workspace Modes
 1. **⚡ Triage Feed**: Intelligent anomaly triage, plain-English diff narratives, Attention Score formula tuner, Health Score radial gauge, and Black Swan Stress Tester.
-2. **⚔️ Stock Duel Studio**: Head-to-head factor comparison studio. Select any two stocks to contrast relative returns, volatility $\sigma$, institutional inflows, and automated quant triage verdicts.
-3. **💼 Paper Trader Desk**: ₹10,00,000 / $100,000 virtual trading simulator. Execute 1-click trades directly from triage cards, track unrealized/realized P&L, win rate %, and **Alpha vs. Benchmark index**.
-4. **🤖 AI Desk Co-Pilot**: Slide-over terminal analyst answering macro risk questions, FII/DII flow breakdowns, and trade ideas with real-time streaming reasoning.
+2. **🐋 Whale Radar & Dark Pool Terminal**: Institutional off-exchange block orders (>$5M), Gamma Exposure (GEX), Put/Call sentiment, Congressional STOCK Act disclosures (Pelosi, Jensen Huang), Wall Street Bulge Bracket consensus targets, and 1,000-path Monte Carlo VaR simulation.
+3. **⚔️ Stock Duel Studio**: Head-to-head factor comparison studio. Select any two stocks to contrast relative returns, volatility $\sigma$, institutional inflows, and automated quant triage verdicts.
+4. **💼 Paper Trader Desk**: ₹10,00,000 / $100,000 virtual trading simulator. Execute 1-click trades directly from triage cards, track unrealized/realized P&L, win rate %, and **Alpha vs. Benchmark index**.
+5. **🤖 AI Desk Co-Pilot**: Slide-over terminal analyst answering macro risk questions, FII/DII flow breakdowns, and trade ideas with real-time streaming reasoning.
 
 ---
 
@@ -61,12 +62,15 @@ Where:
 
 | Feature | Description |
 |---|---|
-| **🔍 Live Ticker Search & Filter Bar** | **New Interface**: Real-time ticker, company name, and sector search with hotkey `/`, Finnhub auto-suggest dropdown, and 1-click filter chips (`All`, `Needs Attention`, `Quiet`, `Gainers`, `Losers`). |
-| **⚡ Dashboard Quick Action Dock** | **New Navigation Dock**: Collapsible side option bar with 1-click workspace switching, live Market Breadth ratio bar, Finnhub latency ping, and breaking market wire headlines. |
+| **🐋 Institutional Whale Radar & Dark Pool Desk** | **Brand New Institutional Workspace**: Real-time tracker for off-exchange blocks (>$5M), Market Gamma Exposure (+$2.84B GEX), Put/Call ratio gauges, Congressional trades (Form 4 & STOCK Act), Bulge Bracket price target consensus, and a 1,000-path Monte Carlo Value-at-Risk (VaR) path projection engine. |
+| **📈 Quant Indicators (RSI & MACD)** | **Technical Analysis Overlays**: Live 14-period Wilder Relative Strength Index (RSI) with 70/30 overbought/oversold bands, and Moving Average Convergence Divergence (MACD 12, 26, 9) signal line + dynamic color histogram bars. |
+| **🔊 Native Web Audio FX & Haptics Engine** | **Zero-Dependency Sound Synthesizer**: Tactile audio cues synthesized natively via Web Audio API oscillators (cyber clicks on navigation, trade fill chimes on paper execution, and klaxon alarms on Black Swan shocks) with a global mute toggle. |
+| **🔍 Live Ticker Search & Filter Bar** | **Interface Enhancement**: Real-time ticker, company name, and sector search with hotkey `/`, Finnhub auto-suggest dropdown, and 1-click filter chips (`All`, `Needs Attention`, `Quiet`, `Gainers`, `Losers`). |
+| **⚡ Dashboard Quick Action Dock** | **Navigation Dock**: Collapsible side option bar with 1-click workspace switching, live Market Breadth ratio bar, Finnhub latency ping, and breaking market wire headlines. |
 | **📊 Pearson Correlation Heatmap** | **Quantitative Matrix**: Pairwise co-movement grid across all watchlist assets with hover inspector, Strongest Co-Movement pair, Top Diversifier / Hedge, and mean portfolio correlation. |
-| **⚔️ Stock Duel Studio** | **New Workspace**: Interactive head-to-head factor battle (returns, z-score, volume anomaly, FII flow, correlation spread, and automated triage verdict). |
-| **💼 ₹10L Paper Trading Desk** | **New Workspace**: Virtual portfolio simulator with real-time mark-to-market P&L, 1-click order tickets, and live Alpha vs Benchmark tracker. |
-| **🤖 AI Trade Desk Co-Pilot** | **New Assistant**: Slide-over terminal analyst with quick chips (*"Why is TSLA flagged?"*, *"Suggest best hedge against rate hike"*). |
+| **⚔️ Stock Duel Studio** | **Comparison Arena**: Interactive head-to-head factor battle (returns, z-score, volume anomaly, FII flow, correlation spread, and automated triage verdict). |
+| **💼 ₹10L Paper Trading Desk** | **Virtual Trading**: Portfolio simulator with real-time mark-to-market P&L, 1-click order tickets, and live Alpha vs Benchmark tracker. |
+| **🤖 AI Trade Desk Co-Pilot** | **Terminal Assistant**: Slide-over analyst with quick chips (*"Why is TSLA flagged?"*, *"Suggest best hedge against rate hike"*). |
 | **🌪️ Black Swan Macro Stress Tester** | **1-Click Crisis Simulator**: Emergency RBI/Fed +75bps Rate Spike, Strait of Hormuz Crude $120/bbl, AI CapEx Bust -25%, Budget Super-Cycle +15%. Auto-calculates portfolio drawdown, isolates top safe-haven hedges vs vulnerabilities, and applies the shock to re-triage the dashboard feed in real-time. |
 | **🎨 Tri-Theme Switcher** | Switch instantly between **🌙 Midnight Cyber** (neon glassmorphic dark mode), **☀️ Groww Emerald Light** (official Groww emerald daylight UI), and **📟 Bloomberg Amber Terminal** (retro CRT amber terminal mode) with persistent localStorage state. |
 | **🏛️ FII / DII Smart Money Strip** | Institutional intelligence displaying real-time Foreign (FII) and Domestic Mutual Fund (DII) net inflows/outflows with net accumulation tags on stock cards. |

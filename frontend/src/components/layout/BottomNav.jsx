@@ -1,5 +1,5 @@
 import React from 'react';
-import { Activity, Swords, Briefcase, Bot, Key, Sparkles } from 'lucide-react';
+import { Activity, Swords, Briefcase, Bot, Key, Sparkles, Radar } from 'lucide-react';
 
 export default function BottomNav({
   activeWorkspace = 'triage',
@@ -43,7 +43,7 @@ export default function BottomNav({
         {/* Tab 3: Paper Trader */}
         <button
           onClick={() => setActiveWorkspace && setActiveWorkspace('paper')}
-          className={`flex flex-col items-center gap-0.5 px-3 py-1 rounded-xl transition-all ${
+          className={`flex flex-col items-center gap-0.5 px-2.5 py-1 rounded-xl transition-all ${
             activeWorkspace === 'paper'
               ? 'text-emerald-300 font-bold'
               : 'text-slate-400 hover:text-slate-200'
@@ -55,7 +55,22 @@ export default function BottomNav({
           <span className="text-[10px] tracking-tight font-medium">Paper</span>
         </button>
 
-        {/* Tab 4: AI Co-Pilot */}
+        {/* Tab 4: Whale Radar Pro */}
+        <button
+          onClick={() => setActiveWorkspace && setActiveWorkspace('pro')}
+          className={`flex flex-col items-center gap-0.5 px-2.5 py-1 rounded-xl transition-all ${
+            activeWorkspace === 'pro'
+              ? 'text-indigo-300 font-bold'
+              : 'text-slate-400 hover:text-slate-200'
+          }`}
+        >
+          <div className={`p-1 rounded-lg ${activeWorkspace === 'pro' ? 'bg-indigo-500/20 shadow-[0_0_12px_rgba(99,102,241,0.3)]' : ''}`}>
+            <Radar className="w-4 h-4 text-indigo-400" />
+          </div>
+          <span className="text-[10px] tracking-tight font-medium">Whale</span>
+        </button>
+
+        {/* Tab 5: AI Co-Pilot */}
         <button
           onClick={onOpenCopilot}
           className="flex flex-col items-center gap-0.5 px-3 py-1 rounded-xl text-teal-400 hover:text-teal-300 transition-all group"

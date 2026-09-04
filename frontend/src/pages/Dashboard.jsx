@@ -34,6 +34,7 @@ import MorningMemoModal from '../components/wow/MorningMemoModal';
 import StressTestModal, { STRESS_SCENARIOS } from '../components/wow/StressTestModal';
 import StockDuel from '../components/duel/StockDuel';
 import PaperTrading from '../components/paper/PaperTrading';
+import ProTerminal from '../components/pro/ProTerminal';
 import AICoPilotDrawer from '../components/copilot/AICoPilotDrawer';
 import Modal from '../components/ui/Modal';
 import Button from '../components/ui/Button';
@@ -44,6 +45,7 @@ import DashboardSearchBar from '../components/layout/DashboardSearchBar';
 import DashboardSideBar from '../components/layout/DashboardSideBar';
 import { useWatchlistStore } from '../store/watchlistStore';
 import { usePaperTradingStore } from '../store/paperTradingStore';
+import { playCyberClick, playShockAlarm, playSuccessChime } from '../utils/soundFx';
 
 export default function Dashboard() {
   const {
@@ -146,6 +148,7 @@ export default function Dashboard() {
   };
 
   const handleApplyStressScenario = (scenarioKey, impactedItems) => {
+    playShockAlarm();
     setActiveStressScenario(scenarioKey);
     const itemMap = new Map(impactedItems.map(i => [i.ticker, i]));
 
@@ -514,6 +517,11 @@ export default function Dashboard() {
             {/* Workspace 3: Paper Trading Virtual Portfolio */}
             {activeWorkspace === 'paper' && (
               <PaperTrading allTickers={allItems} />
+            )}
+
+            {/* Workspace 4: Whale & Dark Pool Pro Terminal */}
+            {activeWorkspace === 'pro' && (
+              <ProTerminal activeTickers={allItems.map(i => i.ticker)} />
             )}
 
             {/* Workspace 1: Triage Feed (Default Core) */}

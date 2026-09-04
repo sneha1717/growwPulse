@@ -19,6 +19,7 @@ import { usePaperTradingStore } from '../../store/paperTradingStore';
 import Button from '../ui/Button';
 import Modal from '../ui/Modal';
 import Input from '../ui/Input';
+import { playTradeFill, playCyberClick } from '../../utils/soundFx';
 
 export default function PaperTrading({ allTickers = [] }) {
   const {
@@ -89,6 +90,7 @@ export default function PaperTrading({ allTickers = [] }) {
         setTradeError(res.error);
         return;
       }
+      playTradeFill();
       setTradeSuccess(`Successfully bought ${shares} shares of ${modalTicker} at ${prefix}${price}`);
     } else {
       const res = sellStock(modalTicker, shares, price);
@@ -96,6 +98,7 @@ export default function PaperTrading({ allTickers = [] }) {
         setTradeError(res.error);
         return;
       }
+      playTradeFill();
       const pnlText = res.profit >= 0 ? `+${prefix}${res.profit.toFixed(2)}` : `-${prefix}${Math.abs(res.profit).toFixed(2)}`;
       setTradeSuccess(`Successfully sold ${shares} shares of ${modalTicker} (${pnlText} P&L)`);
     }
