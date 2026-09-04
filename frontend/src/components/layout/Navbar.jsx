@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Activity, 
   Search, 
@@ -19,7 +19,8 @@ import {
   Key,
   Radar,
   Volume2,
-  VolumeX
+  VolumeX,
+  Sliders
 } from 'lucide-react';
 import Button from '../ui/Button';
 import Modal from '../ui/Modal';
@@ -57,10 +58,21 @@ export default function Navbar({
   const [isWlDropdownOpen, setIsWlDropdownOpen] = useState(false);
   const [isNewWlModalOpen, setIsNewWlModalOpen] = useState(false);
   const [isApiKeyModalOpen, setIsApiKeyModalOpen] = useState(false);
+  const [isToolsOpen, setIsToolsOpen] = useState(false);
   const [newWlName, setNewWlName] = useState('');
-  const [newWlDesc, setNewWlDesc] = useState('');
-
   const activeWatchlist = watchlists.find(w => w.id === activeWatchlistId) || { name: 'Select Watchlist' };
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (!e.target.closest('#tools-dropdown-container')) {
+        setIsToolsOpen(false);
+      }
+    };
+    if (isToolsOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => document.removeEventListener('mousedown', handleClickOutside);
+    }
+  }, [isToolsOpen]);
 
   const handleCreateWatchlist = async (e) => {
     e.preventDefault();
@@ -153,132 +165,174 @@ export default function Navbar({
           </div>
 
           {/* Workspace Switcher Pills */}
-          <div className="hidden md:flex items-center gap-1 p-1 rounded-xl bg-slate-900/90 border border-white/5 font-semibold text-xs shadow-inner">
+          <div className="hidden md:flex items-center gap-1 p-1 rounded-xl bg-slate-900/90 border border-white/5 font-semibold text-xs shadow-inner shrink-0">
             <button
-              onClick={() => setActiveWorkspace && setActiveWorkspace('triage')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-all ${
+              onClick={() => { playCyberClick(); setActiveWorkspace && setActiveWorkspace('triage'); }}
+              className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg transition-all ${
                 activeWorkspace === 'triage'
                   ? 'bg-teal-500/20 text-teal-300 font-bold border border-teal-500/30 shadow-sm'
                   : 'text-slate-400 hover:text-slate-200'
               }`}
             >
               <Activity className="w-3.5 h-3.5 text-teal-400" />
-              <span>Triage Feed</span>
+              <span>Triage</span>
             </button>
 
             <button
-              onClick={() => setActiveWorkspace && setActiveWorkspace('duel')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-all ${
+              onClick={() => { playCyberClick(); setActiveWorkspace && setActiveWorkspace('duel'); }}
+              className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg transition-all ${
                 activeWorkspace === 'duel'
                   ? 'bg-violet-500/20 text-violet-300 font-bold border border-violet-500/30 shadow-sm'
                   : 'text-slate-400 hover:text-slate-200'
               }`}
             >
               <Swords className="w-3.5 h-3.5 text-violet-400" />
-              <span>Stock Duel</span>
+              <span>Duel</span>
             </button>
 
             <button
               onClick={() => { playCyberClick(); setActiveWorkspace && setActiveWorkspace('paper'); }}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-all ${
+              className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg transition-all ${
                 activeWorkspace === 'paper'
                   ? 'bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-500/30 shadow-sm'
                   : 'text-slate-400 hover:text-slate-200'
               }`}
             >
               <Briefcase className="w-3.5 h-3.5 text-emerald-400" />
-              <span>Paper Trader</span>
+              <span>Paper</span>
             </button>
 
             <button
               onClick={() => { playCyberClick(); setActiveWorkspace && setActiveWorkspace('pro'); }}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-all ${
+              className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg transition-all ${
                 activeWorkspace === 'pro'
                   ? 'bg-indigo-500/20 text-indigo-300 font-bold border border-indigo-500/30 shadow-sm'
                   : 'text-slate-400 hover:text-slate-200'
               }`}
             >
               <Radar className="w-3.5 h-3.5 text-indigo-400" />
-              <span>Whale Radar</span>
+              <span>Whale</span>
               <span className="px-1 py-0.2 rounded bg-indigo-500/30 text-[9px] font-mono text-indigo-200 font-bold">PRO</span>
             </button>
           </div>
 
-          {/* Center Search & Cmd+K Pill */}
-          <div className="hidden xl:flex items-center">
+          {/* Center Search & Cmd+K Pill (Visible only on ultra-wide screens) */}
+          <div className="hidden 2xl:flex items-center shrink-0">
             <button
               onClick={() => setCommandPaletteOpen(true)}
-              className="flex items-center gap-3 px-4 py-1.5 rounded-xl glass-panel text-xs text-slate-400 hover:text-slate-200 hover:border-white/20 transition-all border border-white/5"
+              className="flex items-center gap-3 px-3.5 py-1.5 rounded-xl glass-panel text-xs text-slate-400 hover:text-slate-200 hover:border-white/20 transition-all border border-white/5"
             >
               <Search className="w-3.5 h-3.5 text-teal-400" />
-              <span>Search stocks or actions...</span>
-              <kbd className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-slate-800 text-slate-400 border border-white/5">
-                ⌘K
-              </kbd>
+              <span>Search (⌘K)</span>
             </button>
           </div>
 
           {/* Right Action Icons & User */}
-          <div className="flex items-center gap-2.5">
-            {/* Instant Market Shock Demo Button for Judges */}
-            <button
-              onClick={() => simulateMarketShock('TSLA', 5.8, 3.1)}
-              className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-violet-500/10 text-violet-300 border border-violet-500/30 hover:bg-violet-500/20 text-xs font-semibold transition-all shadow-[0_0_15px_rgba(139,92,246,0.15)]"
-              title="Simulate sudden market move on TSLA to test Attention Score triage"
-            >
-              <Zap className="w-3.5 h-3.5 text-violet-400" />
-              <span>Simulate Shock</span>
-            </button>
+          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+            {/* Quick Tools Dropdown */}
+            <div id="tools-dropdown-container" className="relative">
+              <button
+                onClick={() => setIsToolsOpen(prev => !prev)}
+                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl glass-panel hover:bg-slate-800 text-xs font-semibold text-slate-300 border border-white/10 transition-all shadow-sm"
+                title="Open Quant & Market Tools Menu"
+              >
+                <Sliders className="w-3.5 h-3.5 text-teal-400" />
+                <span className="hidden sm:inline">Tools</span>
+                <ChevronDown className={`w-3 h-3 text-slate-400 opacity-60 transition-transform ${isToolsOpen ? 'rotate-180' : ''}`} />
+              </button>
 
-            {/* Correlation Heatmap Button */}
-            <button
-              onClick={onOpenHeatmap}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl glass-panel hover:bg-slate-800 text-xs font-medium text-slate-300 border border-white/10 transition-all"
-              title="View correlation heatmap"
-            >
-              <Grid className="w-3.5 h-3.5 text-teal-400" />
-              <span className="hidden sm:inline">Correlation</span>
-            </button>
+              {isToolsOpen && (
+                <div 
+                  className="absolute top-full mt-2 right-0 w-64 glass-panel rounded-2xl border border-white/10 p-2 shadow-2xl z-50 space-y-1 backdrop-blur-xl bg-slate-950/95"
+                  onClick={() => setIsToolsOpen(false)}
+                >
+                  <div className="text-[10px] font-mono uppercase text-slate-400 px-3 py-1 tracking-wider font-bold">
+                    Quant & Market Tools
+                  </div>
 
-            {/* Black Swan Macro Stress Test Modal Button */}
-            <button
-              onClick={onOpenStress}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-rose-500/10 text-rose-300 border border-rose-500/30 hover:bg-rose-500/20 text-xs font-semibold transition-all shadow-[0_0_15px_rgba(244,63,94,0.15)]"
-              title="Macro Black Swan & Scenario Stress Tester"
-            >
-              <AlertOctagon className="w-3.5 h-3.5 text-rose-400" />
-              <span className="hidden sm:inline">Stress Test</span>
-            </button>
+                  <button
+                    onClick={onOpenStress}
+                    className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-medium text-rose-300 hover:bg-rose-500/10 transition-colors text-left"
+                  >
+                    <AlertOctagon className="w-4 h-4 text-rose-400 shrink-0" />
+                    <div>
+                      <div className="font-bold">Black Swan Stress Test</div>
+                      <div className="text-[10px] text-slate-400 font-sans">Simulate macro rate & oil shocks (Hotkey T)</div>
+                    </div>
+                  </button>
 
-            {/* Morning Memo Printable PDF Button */}
-            <button
-              onClick={onOpenMemo}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl glass-panel hover:bg-slate-800 text-xs font-medium text-teal-300 border border-teal-500/20 hover:border-teal-500/40 transition-all shadow-sm"
-              title="Open executive printable Morning Memo (PDF)"
-            >
-              <FileText className="w-3.5 h-3.5 text-teal-400" />
-              <span className="hidden md:inline">Morning Memo</span>
-            </button>
+                  <button
+                    onClick={onOpenHeatmap}
+                    className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-medium text-slate-200 hover:bg-teal-500/10 hover:text-teal-300 transition-colors text-left"
+                  >
+                    <Grid className="w-4 h-4 text-teal-400 shrink-0" />
+                    <div>
+                      <div className="font-bold">Correlation Heatmap</div>
+                      <div className="text-[10px] text-slate-400 font-sans">Cross-asset Pearson covariance matrix</div>
+                    </div>
+                  </button>
+
+                  <button
+                    onClick={onOpenMemo}
+                    className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-medium text-slate-200 hover:bg-teal-500/10 hover:text-teal-300 transition-colors text-left"
+                  >
+                    <FileText className="w-4 h-4 text-teal-400 shrink-0" />
+                    <div>
+                      <div className="font-bold">Executive Morning Memo</div>
+                      <div className="text-[10px] text-slate-400 font-sans">1-page PDF print & copy (Hotkey M)</div>
+                    </div>
+                  </button>
+
+                  <button
+                    onClick={() => simulateMarketShock('TSLA', 5.8, 3.1)}
+                    className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-medium text-violet-300 hover:bg-violet-500/10 transition-colors text-left"
+                  >
+                    <Zap className="w-4 h-4 text-violet-400 shrink-0" />
+                    <div>
+                      <div className="font-bold">Simulate Shock</div>
+                      <div className="text-[10px] text-slate-400 font-sans">+5.8% TSLA move trigger (Hotkey S)</div>
+                    </div>
+                  </button>
+
+                  <div className="pt-1.5 border-t border-white/5 mt-1 flex items-center justify-between px-3 text-[11px] text-slate-400">
+                    <button
+                      onClick={onOpenShortcuts}
+                      className="flex items-center gap-1.5 hover:text-slate-200 py-1"
+                    >
+                      <Terminal className="w-3.5 h-3.5 text-slate-400" />
+                      <span>Shortcuts (?)</span>
+                    </button>
+                    <button
+                      onClick={() => setShareModalOpen(true)}
+                      className="flex items-center gap-1.5 hover:text-slate-200 py-1"
+                    >
+                      <Share2 className="w-3.5 h-3.5 text-slate-400" />
+                      <span>Share</span>
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
 
             {/* Pulse AI Trade Desk Co-Pilot Trigger */}
             <button
               onClick={onOpenCopilot}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-teal-500/10 via-violet-500/10 to-teal-500/10 text-teal-300 border border-teal-500/30 hover:border-teal-400/60 text-xs font-bold transition-all shadow-[0_0_15px_rgba(20,184,166,0.2)] group"
+              className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl bg-gradient-to-r from-teal-500/10 via-violet-500/10 to-teal-500/10 text-teal-300 border border-teal-500/30 hover:border-teal-400/60 text-xs font-bold transition-all shadow-[0_0_15px_rgba(20,184,166,0.2)] group shrink-0"
               title="Pulse AI Trade Desk Co-Pilot"
             >
-              <span className="w-2 h-2 rounded-full bg-teal-400 animate-pulse" />
-              <Bot className="w-3.5 h-3.5 text-teal-400" />
+              <span className="w-2 h-2 rounded-full bg-teal-400 animate-pulse shrink-0" />
+              <Bot className="w-3.5 h-3.5 text-teal-400 shrink-0" />
               <span className="hidden sm:inline">AI Co-Pilot</span>
             </button>
 
-            {/* Finnhub Live API Status & Key Details Trigger */}
+            {/* Finnhub Live API Status Trigger */}
             <button
               onClick={() => setIsApiKeyModalOpen(true)}
-              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-emerald-500/10 text-emerald-300 border border-emerald-500/30 hover:border-emerald-400/60 text-xs font-semibold transition-all shadow-[0_0_12px_rgba(16,185,129,0.15)] group"
+              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-emerald-500/10 text-emerald-300 border border-emerald-500/30 hover:border-emerald-400/60 text-xs font-semibold transition-all shadow-[0_0_12px_rgba(16,185,129,0.15)] group shrink-0"
               title="Finnhub API Key & Live Data Engine"
             >
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-              <Key className="w-3.5 h-3.5 text-amber-400" />
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shrink-0" />
+              <Key className="w-3.5 h-3.5 text-amber-400 shrink-0" />
               <span className="hidden sm:inline font-mono">Live API</span>
             </button>
 
@@ -289,7 +343,7 @@ export default function Navbar({
                 setSoundMutedState(nextMuted);
                 if (!nextMuted) playSuccessChime();
               }}
-              className="p-2 rounded-xl glass-panel hover:bg-slate-800 text-slate-300 border border-white/10 transition-all"
+              className="p-2 rounded-xl glass-panel hover:bg-slate-800 text-slate-300 border border-white/10 transition-all shrink-0"
               title={soundMutedState ? 'Unmute Sound Effects' : 'Mute Sound Effects'}
             >
               {soundMutedState ? (
@@ -299,35 +353,19 @@ export default function Navbar({
               )}
             </button>
 
-            {/* Display Theme Switcher: Midnight Cyber / Groww Emerald / Bloomberg Amber */}
-            <ThemeToggle />
-
-            {/* Keyboard Shortcuts Button */}
-            <button
-              onClick={onOpenShortcuts}
-              className="p-2 rounded-xl glass-panel hover:bg-slate-800 text-slate-300 border border-white/10 transition-all"
-              title="Bloomberg Terminal Keyboard Shortcuts (?)"
-            >
-              <Terminal className="w-4 h-4 text-slate-400" />
-            </button>
-
-            {/* Share Snapshot Button */}
-            <button
-              onClick={() => setShareModalOpen(true)}
-              className="p-2 rounded-xl glass-panel hover:bg-slate-800 text-slate-300 border border-white/10 transition-all"
-              title="Share Watchlist Snapshot"
-            >
-              <Share2 className="w-4 h-4 text-slate-300" />
-            </button>
+            {/* Display Theme Switcher */}
+            <div className="shrink-0">
+              <ThemeToggle />
+            </div>
 
             {/* User Profile / Logout */}
-            <div className="flex items-center gap-2 pl-2 border-l border-white/5">
-              <span className="hidden xl:inline text-xs text-slate-400 font-mono">
+            <div className="flex items-center gap-1.5 pl-1.5 sm:pl-2 border-l border-white/10 shrink-0">
+              <span className="hidden 2xl:inline text-xs text-slate-400 font-mono">
                 {user?.name || 'Trader'}
               </span>
               <button
                 onClick={logout}
-                className="p-2 rounded-xl text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 transition-all"
+                className="p-2 rounded-xl text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 transition-all shrink-0"
                 title="Logout"
               >
                 <LogOut className="w-4 h-4" />
