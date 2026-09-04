@@ -496,23 +496,37 @@ export function generateMockTimeline(watchlistId = 1) {
 export function generateMockHistory(ticker, days = 30) {
   const meta = STOCKS_DATA[ticker] || { price: 150, symbolPrefix: '$' };
   const history = [];
-  let p = meta.price * 0.9;
+  let p = meta.price * 0.92;
+  const now = Date.now();
   for (let i = days; i >= 0; i--) {
-    p = p * (1 + (Math.random() - 0.48) * 0.02);
-    const date = new Date(Date.now() - i * 86400000).toISOString().split('T')[0];
-    const open = p * (1 - (Math.random() - 0.5) * 0.01);
+    const dailyReturn = (Math.random() - 0.48) * 0.028;
+    p = parseFloat((p * (1 + dailyReturn)).toFixed(2));
+    const dt = new Date(now - i * 86400000);
+    const date = dt.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    const open = parseFloat((p * (1 - (Math.random() - 0.5) * 0.012)).toFixed(2));
     const close = p;
-    const high = Math.max(open, close) * 1.01;
-    const low = Math.min(open, close) * 0.99;
+    const high = parseFloat((Math.max(open, close) * (1 + Math.random() * 0.012)).toFixed(2));
+    const low = parseFloat((Math.min(open, close) * (1 - Math.random() * 0.012)).toFixed(2));
+    const volume = Math.floor(10000000 + Math.random() * 6000000);
+    const pctChange = parseFloat((dailyReturn * 100).toFixed(2));
+
     history.push({
       date,
-      open: parseFloat(open.toFixed(2)),
-      high: parseFloat(high.toFixed(2)),
-      low: parseFloat(low.toFixed(2)),
-      close: parseFloat(close.toFixed(2)),
-      volume: Math.floor(10000000 + Math.random() * 5000000)
+      timestamp: dt.toISOString(),
+      price: close,
+      open,
+      high,
+      low,
+      close,
+      volume,
+      pctChange,
+      isBullish: close >= open
     });
   }
-  return { history };
+  return { 
+    ticker, 
+    points: history, 
+    history 
+  };
 }
 

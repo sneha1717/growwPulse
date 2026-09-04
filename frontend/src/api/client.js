@@ -5,17 +5,92 @@ import {
   generateMockHistory, 
   MOCK_WATCHLISTS 
 } from './mockFallback';
+import { fetchMultipleFinnhubQuotes } from './finnhubClient';
 
 const API_BASE = '/api';
 
-function handleMockFallback(endpoint, options = {}) {
+async function getLiveOrMockFeed(wlId = 1, weights = null) {
+  const baseFeed = generateMockFeed(wlId, weights || undefined);
+  if (wlId === 1 || wlId === '1') {
+    try {
+      const symbols = ['NVDA', 'TSLA', 'AAPL', 'MSFT', 'AMZN', 'GOOGL'];
+      const liveQuotes = await fetchMultipleFinnhubQuotes(symbols);
+      const hasLiveQuotes = Object.keys(liveQuotes).length > 0;
+
+      if (hasLiveQuotes) {
+        const updateItem = (item) => {
+          const live = liveQuotes[item.ticker];
+          if (!live) return item;
+          const currentPrice = live.price;
+          const change = live.change;
+          const pctChange = live.pctChange;
+          const zScore = parseFloat((Math.abs(pctChange) / 1.45).toFixed(2));
+          const volumeRatio = parseFloat((Math.min(4.0, Math.max(0.8, 1.0 + Math.abs(pctChange) * 0.35))).toFixed(1));
+          const c = zScore > 2.2 ? 1 : 0;
+          const t = 0.6;
+          const w = weights || { w1: 2.5, w2: 1.8, w3: 2.2, w4: 0.8 };
+          const attentionScore = parseFloat((w.w1 * zScore + w.w2 * volumeRatio + w.w3 * c + w.w4 * t).toFixed(2));
+
+          return {
+            ...item,
+            price: currentPrice,
+            change,
+            changePct: pctChange,
+            pctChangeDay: pctChange,
+            priceDeltaDay: change,
+            attentionScore,
+            high52: Math.max(item.high52 || currentPrice * 1.15, live.high),
+            low52: Math.min(item.low52 || currentPrice * 0.85, live.low),
+            summarySentence: `${item.ticker} is trading at $${currentPrice.toFixed(2)} (${pctChange >= 0 ? '+' : ''}${pctChange}%) with live Finnhub execution.`,
+            narrative: `${item.ticker} is trading at $${currentPrice.toFixed(2)} (${pctChange >= 0 ? '+' : ''}${pctChange}%) with live Finnhub execution.`,
+            diffSinceLastSeen: {
+              priceDelta: change,
+              pctDelta: pctChange,
+              summary: `Moved ${pctChange >= 0 ? '+' : ''}${pctChange}% in active trading`
+            },
+            scoreBreakdown: {
+              relativeMoveZScore: zScore,
+              volumeAnomalyRatio: volumeRatio,
+              levelCrossings: c ? ['50-Day MA'] : [],
+              timeDecayBoost: t
+            }
+          };
+        };
+
+        const allItems = [...baseFeed.needsAttention, ...baseFeed.quiet].map(updateItem);
+        allItems.sort((a, b) => b.attentionScore - a.attentionScore);
+        allItems.forEach((it, idx) => { it.priorityRank = idx + 1; });
+
+        const needsAttention = allItems.slice(0, 2);
+        const quiet = allItems.slice(2);
+
+        return {
+          ...baseFeed,
+          lastSuccessfulFetchAt: new Date().toISOString(),
+          lastSuccessfulFetchFormatted: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
+          finnhub: {
+            fetchStatus: 'LIVE_FINNHUB',
+            feedSourceLabel: 'Finnhub Live Quote Engine (REST)'
+          },
+          needsAttention,
+          quiet
+        };
+      }
+    } catch (err) {
+      console.warn('[Finnhub] Falling back to baseline simulation:', err);
+    }
+  }
+  return baseFeed;
+}
+
+async function handleMockFallback(endpoint, options = {}) {
   console.info(`[Pulse API] Serving client fallback for ${endpoint}`);
   
   if (endpoint.startsWith('/auth/guest') || endpoint.startsWith('/auth/login') || endpoint.startsWith('/auth/signup')) {
-    return { token: 'demo-jwt-token', user: { id: 1, name: 'Elite Trader', email: 'trader@groww.in' } };
+    return { token: 'demo-jwt-token', user: { id: 1, name: 'Guest Trader', email: 'guest@groww.in' } };
   }
   if (endpoint.startsWith('/auth/me')) {
-    return { user: { id: 1, name: 'Elite Trader', email: 'trader@groww.in' } };
+    return { user: { id: 1, name: 'Guest Trader', email: 'guest@groww.in' } };
   }
   if (endpoint === '/watchlists') {
     return { watchlists: MOCK_WATCHLISTS };
@@ -23,7 +98,14 @@ function handleMockFallback(endpoint, options = {}) {
   if (endpoint.includes('/feed')) {
     const parts = endpoint.split('/');
     const wlId = parts[2] ? parseInt(parts[2], 10) || 1 : 1;
-    return generateMockFeed(wlId);
+    let weights = null;
+    if (options.body) {
+      try {
+        const parsed = JSON.parse(options.body);
+        weights = parsed.weights;
+      } catch (e) {}
+    }
+    return await getLiveOrMockFeed(wlId, weights);
   }
   if (endpoint.includes('/health')) {
     const parts = endpoint.split('/');

@@ -196,14 +196,14 @@ export default function StockCard({
         </div>
 
         {/* Card Expand Tab Buttons */}
-        <div className="pt-2 border-t border-white/5 flex flex-wrap items-center justify-between gap-2">
-          <div className="flex flex-wrap items-center gap-1.5">
+        <div className="pt-2 border-t border-white/5 flex items-center justify-between gap-2">
+          <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none py-0.5 max-w-[calc(100%-80px)] flex-nowrap">
             <button
               onClick={() => {
                 if (!isExpanded) setIsExpanded(true);
                 setActiveTab('chart');
               }}
-              className={`flex items-center gap-1 text-xs px-2.5 py-1 rounded-lg transition-colors ${
+              className={`flex items-center gap-1 text-xs px-2.5 py-1 rounded-lg transition-colors shrink-0 ${
                 isExpanded && activeTab === 'chart'
                   ? 'bg-teal-500/20 text-teal-300 font-semibold border border-teal-500/30'
                   : 'text-slate-400 hover:text-slate-200'
@@ -218,7 +218,7 @@ export default function StockCard({
                 if (!isExpanded) setIsExpanded(true);
                 setActiveTab('catalysts');
               }}
-              className={`flex items-center gap-1 text-xs px-2.5 py-1 rounded-lg transition-colors ${
+              className={`flex items-center gap-1 text-xs px-2.5 py-1 rounded-lg transition-colors shrink-0 ${
                 isExpanded && activeTab === 'catalysts'
                   ? 'bg-teal-500/20 text-teal-300 font-semibold border border-teal-500/30'
                   : 'text-slate-400 hover:text-slate-200'
@@ -233,7 +233,7 @@ export default function StockCard({
                 if (!isExpanded) setIsExpanded(true);
                 setActiveTab('debate');
               }}
-              className={`flex items-center gap-1 text-xs px-2.5 py-1 rounded-lg transition-colors ${
+              className={`flex items-center gap-1 text-xs px-2.5 py-1 rounded-lg transition-colors shrink-0 ${
                 isExpanded && activeTab === 'debate'
                   ? 'bg-teal-500/20 text-teal-300 font-semibold border border-teal-500/30'
                   : 'text-slate-400 hover:text-slate-200'
@@ -248,7 +248,7 @@ export default function StockCard({
                 if (!isExpanded) setIsExpanded(true);
                 setActiveTab('calc');
               }}
-              className={`flex items-center gap-1 text-xs px-2.5 py-1 rounded-lg transition-colors ${
+              className={`flex items-center gap-1 text-xs px-2.5 py-1 rounded-lg transition-colors shrink-0 ${
                 isExpanded && activeTab === 'calc'
                   ? 'bg-teal-500/20 text-teal-300 font-semibold border border-teal-500/30'
                   : 'text-slate-400 hover:text-slate-200'
@@ -263,7 +263,7 @@ export default function StockCard({
                 if (!isExpanded) setIsExpanded(true);
                 setActiveTab('alerts');
               }}
-              className={`flex items-center gap-1 text-xs px-2.5 py-1 rounded-lg transition-colors ${
+              className={`flex items-center gap-1 text-xs px-2.5 py-1 rounded-lg transition-colors shrink-0 ${
                 isExpanded && activeTab === 'alerts'
                   ? 'bg-teal-500/20 text-teal-300 font-semibold border border-teal-500/30'
                   : 'text-slate-400 hover:text-slate-200'
@@ -279,7 +279,7 @@ export default function StockCard({
                 e.stopPropagation();
                 openTradeModal(item.ticker);
               }}
-              className="flex items-center gap-1 text-xs px-2.5 py-1 rounded-lg bg-emerald-500/10 text-emerald-300 hover:bg-emerald-500/20 font-semibold border border-emerald-500/30 transition-all shadow-sm"
+              className="flex items-center gap-1 text-xs px-2.5 py-1 rounded-lg bg-emerald-500/10 text-emerald-300 hover:bg-emerald-500/20 font-semibold border border-emerald-500/30 transition-all shadow-sm shrink-0"
               title={`Execute Virtual Paper Trade for ${item.ticker}`}
             >
               <Briefcase className="w-3.5 h-3.5 text-emerald-400" />
@@ -289,7 +289,7 @@ export default function StockCard({
 
           <button
             onClick={() => setIsExpanded(!isExpanded)}
-            className="flex items-center gap-1 text-xs font-medium text-teal-400 hover:text-teal-300 transition-colors p-1"
+            className="flex items-center gap-1 text-xs font-medium text-teal-400 hover:text-teal-300 transition-colors p-1 shrink-0"
           >
             {isExpanded ? (
               <><span>Close</span><ChevronUp className="w-4 h-4" /></>
@@ -308,15 +308,21 @@ export default function StockCard({
             animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.35, ease: 'easeOut' }}
-            className="px-5 pb-5 pt-1 bg-slate-950/40 border-t border-white/5"
+            className="px-4 sm:px-5 pb-5 pt-1 bg-slate-950/40 border-t border-white/5"
           >
             {activeTab === 'chart' && (
               <div>
                 <div className="flex items-center justify-between pb-1 text-xs text-slate-400">
-                  <span className="font-mono text-[11px] tracking-wide">30-DAY PRICE & VOLUME HISTORY</span>
-                  <span className="text-[10px] text-slate-500">Trailing Volatility: {item.volatility}% / day</span>
+                  <span className="font-mono text-[10px] sm:text-[11px] tracking-wide">30-DAY PRICE & VOLUME HISTORY</span>
+                  <span className="text-[10px] text-slate-500">Trailing Vol: {item.volatility}%</span>
                 </div>
-                <StockChart ticker={item.ticker} isPositive={isUp} symbolPrefix={symbolPrefix} />
+                <StockChart 
+                  ticker={item.ticker} 
+                  isPositive={isUp} 
+                  symbolPrefix={symbolPrefix} 
+                  currentPrice={item.price} 
+                  pctChange={item.pctChangeDay} 
+                />
               </div>
             )}
 

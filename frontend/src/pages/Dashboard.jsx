@@ -316,7 +316,7 @@ export default function Dashboard() {
         />
       )}
 
-      <main className="relative z-10 max-w-7xl mx-auto w-full px-4 sm:px-6 py-6 space-y-6 flex-1">
+      <main className="relative z-10 max-w-7xl mx-auto w-full px-3 sm:px-6 pt-4 pb-24 md:pb-8 space-y-5 sm:space-y-6 flex-1">
         {/* Dual Market Quick Switcher Pills (US Wall Street vs Indian Nifty 50) */}
         {watchlists.length > 0 && (
           <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">

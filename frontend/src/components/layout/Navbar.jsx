@@ -15,12 +15,15 @@ import {
   AlertOctagon,
   Swords,
   Briefcase,
-  Bot
+  Bot,
+  Key
 } from 'lucide-react';
 import Button from '../ui/Button';
 import Modal from '../ui/Modal';
 import Input from '../ui/Input';
 import ThemeToggle from './ThemeToggle';
+import ApiKeyModal from './ApiKeyModal';
+import BottomNav from './BottomNav';
 import { useAuthStore } from '../../store/authStore';
 import { useWatchlistStore } from '../../store/watchlistStore';
 
@@ -48,6 +51,7 @@ export default function Navbar({
 
   const [isWlDropdownOpen, setIsWlDropdownOpen] = useState(false);
   const [isNewWlModalOpen, setIsNewWlModalOpen] = useState(false);
+  const [isApiKeyModalOpen, setIsApiKeyModalOpen] = useState(false);
   const [newWlName, setNewWlName] = useState('');
   const [newWlDesc, setNewWlDesc] = useState('');
 
@@ -249,6 +253,17 @@ export default function Navbar({
               <span className="hidden sm:inline">AI Co-Pilot</span>
             </button>
 
+            {/* Finnhub Live API Status & Key Details Trigger */}
+            <button
+              onClick={() => setIsApiKeyModalOpen(true)}
+              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-emerald-500/10 text-emerald-300 border border-emerald-500/30 hover:border-emerald-400/60 text-xs font-semibold transition-all shadow-[0_0_12px_rgba(16,185,129,0.15)] group"
+              title="Finnhub API Key & Live Data Engine"
+            >
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+              <Key className="w-3.5 h-3.5 text-amber-400" />
+              <span className="hidden sm:inline font-mono">Live API</span>
+            </button>
+
             {/* Display Theme Switcher: Midnight Cyber / Groww Emerald / Bloomberg Amber */}
             <ThemeToggle />
 
@@ -286,6 +301,20 @@ export default function Navbar({
           </div>
         </div>
       </header>
+
+      {/* Finnhub API Key & Live Data Engine Modal */}
+      <ApiKeyModal
+        isOpen={isApiKeyModalOpen}
+        onClose={() => setIsApiKeyModalOpen(false)}
+      />
+
+      {/* Mobile Bottom Navigation Bar (< md screens) */}
+      <BottomNav
+        activeWorkspace={activeWorkspace}
+        setActiveWorkspace={setActiveWorkspace}
+        onOpenCopilot={onOpenCopilot}
+        onOpenApiKey={() => setIsApiKeyModalOpen(true)}
+      />
 
       {/* Create Watchlist Modal */}
       <Modal

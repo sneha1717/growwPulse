@@ -28,11 +28,11 @@ export default function TickerTape({ items = [], onSelectTicker }) {
                 {item.ticker}
               </span>
               <span className="font-mono text-xs text-slate-300">
-                ${item.price.toFixed(2)}
+                {item.symbolPrefix || '$'}{typeof item.price === 'number' ? item.price.toFixed(2) : item.price}
               </span>
               <span className={`font-mono text-[11px] flex items-center gap-0.5 font-semibold ${isUp ? 'text-emerald-400' : 'text-rose-400'}`}>
                 {isUp ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
-                {isUp ? '+' : ''}{item.pctChangeDay.toFixed(2)}%
+                {isUp ? '+' : ''}{typeof item.pctChangeDay === 'number' ? item.pctChangeDay.toFixed(2) : item.pctChangeDay}%
               </span>
               <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-slate-800 text-teal-300 border border-white/5">
                 ★ {item.attentionScore}
